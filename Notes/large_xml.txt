@@ -1,0 +1,36 @@
+import xml.etree.ElementTree as etree
+for event, elem in etree.iterparse(xmL, events=('start', 'end', 'start-ns', 'end-ns')):
+  print (event, elem)
+  
+This will parse the XML file in chunks at a time and give it to you at every step of the way. start will trigger when a tag is first encountered. At this point elem will be empty except for elem.attrib that contains the properties of the tag. end will trigger when the closing tag is encountered, and everything in-between has been read.
+
+
+
+
+
+
+start-ns is probably the most important thing you will encounter to process XML serially. ElementTree has wisely provided this call for you to gather all the namespaces in the file. You will need to store this in a special namespace dictionary nsmap:
+
+nsmap = {}
+results = []
+for event, elem in etree.iterparse(xmL, events=('end', 'start-ns')):
+  if event == 'start-ns':
+    ns, url = elem		# elem contain the namespace, url. This line assignes ns and url respectively
+    nsmap[ns] = url		# Assign ns to url 
+  if event == 'end':
+    if elem.tag == fixtag('GAML', 'peptide', nsmap):
+      result = process_peptide(elem, nsmap)
+      results.append(result)
+      
+And we send the peptide subbranch of the XML file into a parsing function. This structure will be nicely parsed.
+
+
+
+
+
+
+However, once you've collected your nsmap, you can construct the tags in a straightforward using the fixtag function:
+
+def fixtag(ns, tag, nsmap):
+  return '{' + nsmap[ns] + '}' + tag
+

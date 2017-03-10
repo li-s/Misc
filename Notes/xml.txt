@@ -1,0 +1,83 @@
+Baxic xml concepts
+
+xml - much like python, has elements shown by start and end tages(<xml></xmL>)
+
+Can be nested to any depth
+
+Then first unnested element is called the root element, and only one root(ie unested) element
+
+Elements can have attributes, which are name-value pairs. Attributes are listed within the start tag of an element and separated by whitespace. Attribute names can not be repeated within an element. Attribute values must be quoted. You may use either single or double quotes. 
+
+If an element has more than one attribute, the ordering of the attributes is not significant. An element’s attributes form an unordered set of keys and values, like a Python dictionary. There is no limit to the number of attributes you can define on each element. 
+
+Like Python functions can be declared in different modules, XML elements can be declared in different namespaces. Namespaces usually look like URLs. You use an xmlns declaration to define a default namespace. A namespace declaration looks similar to an attribute, but it has a different purpose.
+
+You can also use an xmlns:prefix declaration to define a namespace and associate it with a prefix. Then each element in that namespace must be explicitly declared with the prefix. 
+
+Finally, XML documents can contain character encoding information on the first line, before the root element. 
+
+Any element can contain an xml:lang attribute, which declares the language of the element and its children. In this case, the xml:lang attribute is declared once on the root element, which means the entire feed is in English.
+
+
+
+
+
+
+
+
+example:
+
+>>> import xml.etree.ElementTree as etree    ①
+>>> tree = etree.parse('examples/feed.xml')  ②
+>>> root = tree.getroot()                    ③               # tree is the whole xml document, while getroot will output the root element
+>>> root                                     ④
+<Element {http://www.w3.org/2005/Atom}feed at cd1eb0>
+
+①	The ElementTree library is part of the Python standard library, in xml.etree.ElementTree.
+②	The primary entry point for the ElementTree library is the parse() function, which can take a filename or a file-like object. This function parses the entire document at once. If memory is tight, there are ways to parse an XML document incrementally instead.
+③	The parse() function returns an object which represents the entire document. This is not the root element. To get a reference to the root element, call the getroot() method.
+④	As expected, the root element is the feed element in the http://www.w3.org/2005/Atom namespace. The string representation of this object reinforces an important point: an XML element is a combination of its namespace and its tag name (also called the local name). Every element in this document is in the Atom namespace, so the root element is represented as {http://www.w3.org/2005/Atom}feed. 
+
+
+
+
+
+
+
+
+>>> root.findall('{http://www.w3.org/2005/Atom}entry')    ①
+[<Element {http://www.w3.org/2005/Atom}entry at e2b4e0>,
+<Element {http://www.w3.org/2005/Atom}entry at e2b510>,
+<Element {http://www.w3.org/2005/Atom}entry at e2b540>]
+
+
+
+There is also a find() method which returns the first matching element. This is useful for situations where you are only expecting one match, or if there are multiple matches, you only care about the first one. 
+title_element = entries[0].find('{http://www.w3.org/2005/Atom}title')       # need to understand the entries[0] call    # is it the first entry with the 'entries' element heading
+ 
+ 
+	** There is a “gotcha” with the find() method that will eventually bite you. In a boolean context, ElementTree element objects will evaluate to False if they contain no children (i.e. if len(element) is 0). This means that if element.find('...') is not testing whether the find() method found a matching element; it’s testing whether that matching element has any child elements! To test whether the find() method returned an element, use if element.find('...') is not None. 
+ 	
+ 	
+ 
+ 
+ 
+ 
+ 	The query — //{http://www.w3.org/2005/Atom}link — is very similar to the previous examples, except for the two slashes at the beginning of the query. Those two slashes mean “don’t just look for direct children; I want any elements, regardless of nesting level.” So the result is a list of four link elements, not just one.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
