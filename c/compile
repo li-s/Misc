@@ -1,0 +1,6 @@
+how to compile:
+gcc -o _compiiled_name_ _compiler_name_.c
+
+how to debug:
+gcc -g _debug_name_ _compiler_name_.c
+gdb _debug_name_.out
